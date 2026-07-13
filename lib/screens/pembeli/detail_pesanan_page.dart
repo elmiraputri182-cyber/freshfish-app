@@ -41,17 +41,8 @@ class DetailPesananPage extends StatelessWidget {
       fotoIkan = data["foto_ikan"] ?? "";
     }
 
-    int totalKg = 0;
     double totalHarga = double.tryParse(data["total_pembayaran"]?.toString() ?? "") ?? 
                          double.tryParse(data["total_harga"]?.toString() ?? "") ?? 0;
-
-    if (listItems != null && listItems.isNotEmpty) {
-      for (var detail in listItems) {
-        totalKg += int.tryParse(detail["jumlah_pesan"].toString()) ?? 0;
-      }
-    } else {
-      totalKg = int.tryParse(data["jumlah_kg"].toString()) ?? 0;
-    }
 
     return Scaffold(
       backgroundColor: const Color(0xffF8FAFC),
@@ -73,150 +64,7 @@ class DetailPesananPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// FOTO IKAN CARD
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 16,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: Image.network(
-                  "${Api.baseUrl}/uploads/$fotoIkan",
-                  height: 220,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) {
-                    return Container(
-                      height: 220,
-                      color: Colors.grey.shade100,
-                      child: const Icon(
-                        Icons.image,
-                        size: 70,
-                        color: Colors.grey,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Title & Status Row
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    displayNamaIkan,
-                    style: GoogleFonts.poppins(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF2C3E50),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: warnaStatus.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    data["status"],
-                    style: GoogleFonts.poppins(
-                      color: warnaStatus,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Card Daftar Produk (Only show if multiple items exist)
-            if (listItems != null && listItems.isNotEmpty) ...[
-              Text(
-                "Daftar Produk",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: const Color(0xFF2C3E50),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: listItems.map((item) {
-                    final nama = item["nama_ikan"] ?? "-";
-                    final qty = item["jumlah_pesan"] ?? item["jumlah"] ?? "-";
-                    final sub = double.tryParse(item["subtotal"].toString()) ?? 0;
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              "$nama ($qty Kg)",
-                              style: GoogleFonts.poppins(
-                                fontSize: 13,
-                                color: const Color(0xFF2C3E50),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            rupiah.format(sub),
-                            style: GoogleFonts.poppins(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF0060A9),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              const SizedBox(height: 24),
-            ],
-
-            // Card Detail Transaksi
-            Text(
-              "Rincian Transaksi",
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: const Color(0xFF2C3E50),
-              ),
-            ),
-            const SizedBox(height: 12),
+            /// MAIN HEADER CARD (Image 1 Mockup Style)
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -231,61 +79,280 @@ class DetailPesananPage extends StatelessWidget {
                 ],
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  itemDetail(Icons.tag, "ID Pesanan", "#${data["id_pesanan"]}"),
-                  const Divider(),
-                  itemDetail(
-                    Icons.calendar_month_outlined,
-                    "Tanggal",
-                    data["tanggal"],
-                  ),
-                  const Divider(),
-                  itemDetail(
-                    Icons.scale_outlined,
-                    "Jumlah Total",
-                    "$totalKg Kg",
-                  ),
-                  const Divider(),
-                  if (listItems == null || listItems.length <= 1) ...[
-                    itemDetail(
-                      Icons.sell_outlined,
-                      "Harga per Kg",
-                      rupiah.format(
-                        double.tryParse(data["harga"].toString()) ?? 0,
-                      ),
+                  // Cover Image
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.network(
+                      "${Api.baseUrl}/uploads/$fotoIkan",
+                      height: 180,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) {
+                        return Container(
+                          height: 180,
+                          color: Colors.grey.shade100,
+                          child: const Icon(
+                            Icons.image,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
                     ),
-                    const Divider(),
-                  ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Badges
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: warnaStatus.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          data["status"] ?? "-",
+                          style: GoogleFonts.poppins(
+                            color: warnaStatus,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEBF5FF),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          (data["jenis_pesanan"] ?? "order").toString().toLowerCase(),
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF0060A9),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Title
+                  Text(
+                    displayNamaIkan,
+                    style: GoogleFonts.poppins(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF2C3E50),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Divider(),
+                  const SizedBox(height: 12),
+
+                  // Details List
+                  itemDetail(
+                    Icons.person_outline,
+                    "Pembeli:",
+                    data["nama_pembeli"] ?? data["nama_lengkap"] ?? "-",
+                  ),
+                  const SizedBox(height: 4),
+                  itemDetail(
+                    Icons.phone_outlined,
+                    "No HP:",
+                    data["no_hp_pembeli"] ?? data["no_telp"] ?? "-",
+                  ),
+                  const SizedBox(height: 4),
                   itemDetail(
                     Icons.payments_outlined,
-                    "Total Pembayaran",
+                    "Total Pembayaran:",
                     rupiah.format(totalHarga),
                     highlightValue: true,
                   ),
-                  const Divider(),
+                  const SizedBox(height: 4),
                   itemDetail(
                     Icons.credit_card_outlined,
-                    "Pembayaran",
-                    data["metode_pembayaran"].toString().toUpperCase(),
+                    "Metode:",
+                    data["metode_pembayaran"].toString().toLowerCase(),
                   ),
-                  const Divider(),
+                  const SizedBox(height: 4),
                   itemDetail(
                     Icons.local_shipping_outlined,
-                    "Pengambilan",
-                    data["metode_pengambilan"].toString().toUpperCase(),
-                  ),
-                  const Divider(),
-                  itemDetail(
-                    Icons.person_outline,
-                    "Agen Penjual",
-                    data["nama_agen"] ?? "-",
+                    "Pengambilan:",
+                    data["metode_pengambilan"].toString().toLowerCase(),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 20),
 
-            // Status Stepper/Timeline
+            // CARD ITEM PESANAN (Image 1 Mockup Style)
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.02),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Item Pesanan",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: const Color(0xFF2C3E50),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  if (listItems != null && listItems.isNotEmpty)
+                    ...listItems.map((item) {
+                      final nama = item["nama_ikan"] ?? "-";
+                      final qty = item["jumlah_pesan"] ?? item["jumlah"] ?? "-";
+                      final harga = double.tryParse(item["harga"].toString()) ?? 0;
+                      final sub = double.tryParse(item["subtotal"].toString()) ?? 0;
+                      final foto = item["foto_ikan"] ?? "";
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                "${Api.baseUrl}/uploads/$foto",
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) {
+                                  return Container(
+                                    width: 50,
+                                    height: 50,
+                                    color: Colors.grey.shade100,
+                                    child: const Icon(
+                                      Icons.image,
+                                      size: 20,
+                                      color: Colors.grey,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    nama,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF2C3E50),
+                                    ),
+                                  ),
+                                  Text(
+                                    "${rupiah.format(harga)} x $qty Kg",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 11,
+                                      color: Colors.grey.shade500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              rupiah.format(sub),
+                              style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF2C3E50)),
+                            ),
+                          ],
+                        ),
+                      );
+                    })
+                  else
+                    Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            "${Api.baseUrl}/uploads/$fotoIkan",
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) {
+                              return Container(
+                                width: 50,
+                                height: 50,
+                                color: Colors.grey.shade100,
+                                child: const Icon(
+                                  Icons.image,
+                                  size: 20,
+                                  color: Colors.grey,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                data["nama_ikan"] ?? "-",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF2C3E50),
+                                ),
+                              ),
+                              Text(
+                                "${rupiah.format(double.tryParse(data["harga"].toString()) ?? 0)} x ${data["jumlah_kg"]} Kg",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          rupiah.format(double.tryParse(data["total_harga"].toString()) ?? 0),
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF2C3E50),
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Card Status Pesanan (Image 2 style)
             Text(
               "Status Pesanan",
               style: GoogleFonts.poppins(
