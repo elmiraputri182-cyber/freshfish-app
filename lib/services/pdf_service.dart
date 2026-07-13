@@ -51,7 +51,7 @@ class PdfService {
             totalKg,
             totalPemasukan,
           ),
-          buildTable(laporan),
+          ...buildTable(laporan),
           buildFooter(sekarang, totalPemasukan),
         ],
       ),

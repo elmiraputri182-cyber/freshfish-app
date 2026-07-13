@@ -178,7 +178,7 @@ class _RiwayatPageState extends State<RiwayatPage> {
                                           ),
                                         ),
                                         child: Text(
-                                          item["status"],
+                                          item["status"] ?? "-",
                                           style: GoogleFonts.poppins(
                                             fontSize: 8,
                                             fontWeight: FontWeight.bold,
@@ -189,15 +189,26 @@ class _RiwayatPageState extends State<RiwayatPage> {
                                     ],
                                   ),
                                   const SizedBox(height: 2),
-                                  Text(
-                                    item["nama_ikan"],
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: const Color(0xFF2C3E50),
-                                    ),
+                                  Builder(
+                                    builder: (context) {
+                                      String displayNama = "";
+                                      final listItems = item["items"] as List?;
+                                      if (listItems != null && listItems.isNotEmpty) {
+                                        displayNama = listItems.map((e) => e["nama_ikan"] ?? "").join(", ");
+                                      } else {
+                                        displayNama = item["nama_ikan"] ?? "Ikan Terhapus";
+                                      }
+                                      return Text(
+                                        displayNama,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: const Color(0xFF2C3E50),
+                                        ),
+                                      );
+                                    },
                                   ),
                                   const SizedBox(height: 4),
                                   Row(
@@ -224,7 +235,7 @@ class _RiwayatPageState extends State<RiwayatPage> {
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        item["tanggal"],
+                                        item["tanggal"] ?? "-",
                                         style: GoogleFonts.poppins(
                                           fontSize: 11,
                                           color: Colors.grey.shade600,
