@@ -41,6 +41,18 @@ class DetailPesananPage extends StatelessWidget {
       fotoIkan = data["foto_ikan"] ?? "";
     }
 
+    int totalKg = 0;
+    double totalHarga = double.tryParse(data["total_pembayaran"]?.toString() ?? "") ?? 
+                         double.tryParse(data["total_harga"]?.toString() ?? "") ?? 0;
+
+    if (listItems != null && listItems.isNotEmpty) {
+      for (var detail in listItems) {
+        totalKg += int.tryParse(detail["jumlah_pesan"].toString()) ?? 0;
+      }
+    } else {
+      totalKg = int.tryParse(data["jumlah_kg"].toString()) ?? 0;
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xffF8FAFC),
       appBar: AppBar(
@@ -134,6 +146,67 @@ class DetailPesananPage extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
+            // Card Daftar Produk (Only show if multiple items exist)
+            if (listItems != null && listItems.isNotEmpty) ...[
+              Text(
+                "Daftar Produk",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: const Color(0xFF2C3E50),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.02),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: listItems.map((item) {
+                    final nama = item["nama_ikan"] ?? "-";
+                    final qty = item["jumlah_pesan"] ?? item["jumlah"] ?? "-";
+                    final sub = double.tryParse(item["subtotal"].toString()) ?? 0;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              "$nama ($qty Kg)",
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: const Color(0xFF2C3E50),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            rupiah.format(sub),
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF0060A9),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+
             // Card Detail Transaksi
             Text(
               "Rincian Transaksi",
@@ -169,24 +242,24 @@ class DetailPesananPage extends StatelessWidget {
                   const Divider(),
                   itemDetail(
                     Icons.scale_outlined,
-                    "Jumlah",
-                    "${data["jumlah_kg"]} Kg",
+                    "Jumlah Total",
+                    "$totalKg Kg",
                   ),
                   const Divider(),
-                  itemDetail(
-                    Icons.sell_outlined,
-                    "Harga per Kg",
-                    rupiah.format(
-                      double.tryParse(data["harga"].toString()) ?? 0,
+                  if (listItems == null || listItems.length <= 1) ...[
+                    itemDetail(
+                      Icons.sell_outlined,
+                      "Harga per Kg",
+                      rupiah.format(
+                        double.tryParse(data["harga"].toString()) ?? 0,
+                      ),
                     ),
-                  ),
-                  const Divider(),
+                    const Divider(),
+                  ],
                   itemDetail(
                     Icons.payments_outlined,
-                    "Total Belanja",
-                    rupiah.format(
-                      double.tryParse(data["total_harga"].toString()) ?? 0,
-                    ),
+                    "Total Pembayaran",
+                    rupiah.format(totalHarga),
                     highlightValue: true,
                   ),
                   const Divider(),

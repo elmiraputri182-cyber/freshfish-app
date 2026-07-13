@@ -211,53 +211,68 @@ class _RiwayatPageState extends State<RiwayatPage> {
                                     },
                                   ),
                                   const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.scale_outlined,
-                                        size: 14,
-                                        color: Color(0xFF0060A9),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        "${item["jumlah_kg"]} Kg",
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 12,
-                                          color: Colors.grey.shade700,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      const Icon(
-                                        Icons.calendar_month_outlined,
-                                        size: 14,
-                                        color: Color(0xFF0060A9),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        item["tanggal"] ?? "-",
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 11,
-                                          color: Colors.grey.shade600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    rupiah.format(
-                                      double.tryParse(
-                                            item["total_harga"].toString(),
-                                          ) ??
-                                          0,
-                                    ),
-                                    style: GoogleFonts.poppins(
-                                      color: const Color(
-                                        0xFF0060A9,
-                                      ), // Blue color for total price
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                    ),
+                                  Builder(
+                                    builder: (context) {
+                                      int totalKg = 0;
+                                      final listItems = item["items"] as List?;
+                                      if (listItems != null && listItems.isNotEmpty) {
+                                        for (var detail in listItems) {
+                                          totalKg += int.tryParse(detail["jumlah_pesan"].toString()) ?? 0;
+                                        }
+                                      } else {
+                                        totalKg = int.tryParse(item["jumlah_kg"].toString()) ?? 0;
+                                      }
+
+                                      double totalHarga = double.tryParse(item["total_pembayaran"]?.toString() ?? "") ?? 
+                                                           double.tryParse(item["total_harga"]?.toString() ?? "") ?? 0;
+
+                                      return Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.scale_outlined,
+                                                size: 14,
+                                                color: Color(0xFF0060A9),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                "$totalKg Kg",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 12,
+                                                  color: Colors.grey.shade700,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              const Icon(
+                                                Icons.calendar_month_outlined,
+                                                size: 14,
+                                                color: Color(0xFF0060A9),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                item["tanggal"] ?? "-",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 11,
+                                                  color: Colors.grey.shade600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            rupiah.format(totalHarga),
+                                            style: GoogleFonts.poppins(
+                                              color: const Color(0xFF0060A9),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20,
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
                                   ),
                                 ],
                               ),

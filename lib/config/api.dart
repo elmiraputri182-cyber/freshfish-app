@@ -1,3 +1,3 @@
 class Api {
-  static const String baseUrl = "http://192.168.1.13/appfreashfish/freashfish_api";
+  static const String baseUrl = "https://api.freshfish.my.id/";
 }
