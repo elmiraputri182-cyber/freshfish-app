@@ -121,10 +121,30 @@ class _InfoHargaPageState extends State<InfoHargaPage> {
                   String statusHarga = "STABIL";
 
                   if (hargaLama != 0 && hargaLama != harga) {
-                    if (harga > hargaLama) {
-                      statusHarga = "NAIK";
-                    } else if (harga < hargaLama) {
-                      statusHarga = "TURUN";
+                    bool isValidInterval = true;
+                    if (ikan["tanggal_update_harga"] != null) {
+                      try {
+                        DateTime tanggalUpdate = DateTime.parse(ikan["tanggal_update_harga"].toString());
+                        DateTime sekarang = DateTime.now();
+                        
+                        DateTime tUpdateOnlyDate = DateTime(tanggalUpdate.year, tanggalUpdate.month, tanggalUpdate.day);
+                        DateTime sekarangOnlyDate = DateTime(sekarang.year, sekarang.month, sekarang.day);
+                        int selisihHari = sekarangOnlyDate.difference(tUpdateOnlyDate).inDays;
+
+                        if (selisihHari > 3) {
+                          isValidInterval = false;
+                        }
+                      } catch (_) {
+                        // Jika gagal parsing, biarkan true (fallback aman)
+                      }
+                    }
+
+                    if (isValidInterval) {
+                      if (harga > hargaLama) {
+                        statusHarga = "NAIK";
+                      } else if (harga < hargaLama) {
+                        statusHarga = "TURUN";
+                      }
                     }
                   }
 
