@@ -301,4 +301,227 @@ class PdfService {
       name: "Invoice #${data["kode_pesanan"] ?? data["id_pesanan"]}",
     );
   }
+
+  static Future<void> cetakLaporanAdmin({
+    required List rekapAgen,
+    required int totalPembeli,
+    required int totalAgen,
+    required int totalPesanan,
+    required double totalPendapatan,
+    required int menunggu,
+    required int diproses,
+    required int selesai,
+  }) async {
+    final pdf = pw.Document();
+
+    final sekarang = DateFormat(
+      "dd MMMM yyyy HH:mm",
+      "id_ID",
+    ).format(DateTime.now());
+
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(32),
+        build: (_) => [
+          // Header
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    "FRESH FISH BENGKALIS",
+                    style: pw.TextStyle(
+                      fontSize: 22,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColor.fromHex("#0060A9"),
+                    ),
+                  ),
+                  pw.SizedBox(height: 4),
+                  pw.Text(
+                    "Laporan Ringkasan Performa & Statistik Penjualan Sistem",
+                    style: const pw.TextStyle(fontSize: 10),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          pw.SizedBox(height: 12),
+          pw.Divider(thickness: 2, color: PdfColor.fromHex("#E5E7EB")),
+          pw.SizedBox(height: 16),
+
+          // Info Ringkasan
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text("Dicetak pada: $sekarang", style: const pw.TextStyle(fontSize: 10)),
+              pw.Text("Role Pencetak: Administrator", style: const pw.TextStyle(fontSize: 10)),
+            ],
+          ),
+          pw.SizedBox(height: 20),
+
+          // Metrik Ringkasan Box
+          pw.Text(
+            "Ringkasan Performa Sistem",
+            style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+          ),
+          pw.SizedBox(height: 8),
+          pw.GridView(
+            crossAxisCount: 2,
+            childAspectRatio: 0.25,
+            children: [
+              pw.Container(
+                padding: const pw.EdgeInsets.all(10),
+                decoration: pw.BoxDecoration(
+                  border: pw.Border.all(color: PdfColor.fromHex("#E5E7EB")),
+                  color: PdfColor.fromHex("#F9FAFB"),
+                ),
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text("Total Pendapatan", style: const pw.TextStyle(fontSize: 10)),
+                    pw.SizedBox(height: 4),
+                    pw.Text(rupiah.format(totalPendapatan), style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex("#10B981"))),
+                  ],
+                ),
+              ),
+              pw.Container(
+                padding: const pw.EdgeInsets.all(10),
+                decoration: pw.BoxDecoration(
+                  border: pw.Border.all(color: PdfColor.fromHex("#E5E7EB")),
+                  color: PdfColor.fromHex("#F9FAFB"),
+                ),
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text("Total Pesanan Selesai", style: const pw.TextStyle(fontSize: 10)),
+                    pw.SizedBox(height: 4),
+                    pw.Text("$selesai Pesanan", style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex("#0060A9"))),
+                  ],
+                ),
+              ),
+              pw.Container(
+                padding: const pw.EdgeInsets.all(10),
+                decoration: pw.BoxDecoration(
+                  border: pw.Border.all(color: PdfColor.fromHex("#E5E7EB")),
+                  color: PdfColor.fromHex("#F9FAFB"),
+                ),
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text("Total Mitra Agen", style: const pw.TextStyle(fontSize: 10)),
+                    pw.SizedBox(height: 4),
+                    pw.Text("$totalAgen Agen", style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                  ],
+                ),
+              ),
+              pw.Container(
+                padding: const pw.EdgeInsets.all(10),
+                decoration: pw.BoxDecoration(
+                  border: pw.Border.all(color: PdfColor.fromHex("#E5E7EB")),
+                  color: PdfColor.fromHex("#F9FAFB"),
+                ),
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text("Total Pengguna Pembeli", style: const pw.TextStyle(fontSize: 10)),
+                    pw.SizedBox(height: 4),
+                    pw.Text("$totalPembeli Pembeli", style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          pw.SizedBox(height: 24),
+
+          // Tabel Kontribusi per Agen
+          pw.Text(
+            "Tabel Kontribusi Penjualan per Agen",
+            style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+          ),
+          pw.SizedBox(height: 8),
+
+          pw.Table(
+            border: pw.TableBorder.all(color: PdfColor.fromHex("#E5E7EB"), width: 0.5),
+            columnWidths: {
+              0: const pw.FixedColumnWidth(40),
+              1: const pw.FlexColumnWidth(),
+              2: const pw.FixedColumnWidth(150),
+              3: const pw.FixedColumnWidth(150),
+            },
+            children: [
+              // Header
+              pw.TableRow(
+                decoration: pw.BoxDecoration(color: PdfColor.fromHex("#F3F4F6")),
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8),
+                    child: pw.Text("No", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8),
+                    child: pw.Text("Nama Agen", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8),
+                    child: pw.Text("Jumlah Pesanan Selesai", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10), textAlign: pw.TextAlign.center),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8),
+                    child: pw.Text("Total Pemasukan", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10), textAlign: pw.TextAlign.right),
+                  ),
+                ],
+              ),
+              // Body
+              ...List.generate(rekapAgen.length, (index) {
+                final item = rekapAgen[index];
+                final String nama = item["nama_agen"] ?? "-";
+                final String pesanan = item["total_pesanan"].toString();
+                final double pemasukan = double.tryParse(item["total_pemasukan"].toString()) ?? 0;
+
+                return pw.TableRow(
+                  children: [
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8),
+                      child: pw.Text("${index + 1}", style: const pw.TextStyle(fontSize: 10)),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8),
+                      child: pw.Text(nama, style: const pw.TextStyle(fontSize: 10)),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8),
+                      child: pw.Text(pesanan, style: const pw.TextStyle(fontSize: 10), textAlign: pw.TextAlign.center),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8),
+                      child: pw.Text(rupiah.format(pemasukan), style: const pw.TextStyle(fontSize: 10), textAlign: pw.TextAlign.right),
+                    ),
+                  ],
+                );
+              }),
+            ],
+          ),
+          pw.SizedBox(height: 24),
+
+          // Footer
+          pw.Divider(thickness: 1, color: PdfColor.fromHex("#E5E7EB")),
+          pw.SizedBox(height: 8),
+          pw.Center(
+            child: pw.Text(
+              "Laporan ini sah dan dicetak secara elektronik oleh platform Fresh Fish.",
+              style: pw.TextStyle(fontSize: 8, fontStyle: pw.FontStyle.italic, color: PdfColor.fromHex("#6B7280")),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (format) async => pdf.save(),
+      name: "Laporan Performa Admin $sekarang",
+    );
+  }
 }

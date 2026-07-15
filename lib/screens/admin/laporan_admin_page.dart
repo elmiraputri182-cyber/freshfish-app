@@ -1,4 +1,5 @@
 import 'package:appfreshfish/config/api.dart';
+import 'package:appfreshfish/services/pdf_service.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -255,6 +256,145 @@ class _LaporanAdminPageState extends State<LaporanAdminPage> {
                           },
                         ),
                       ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    "Kontribusi Penjualan per Agen",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: const Color(0xFF2C3E50),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Rekap Agen list container
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.015),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Builder(
+                      builder: (context) {
+                        final rekapList = laporan["rekap_agen"] as List?;
+                        if (rekapList == null || rekapList.isEmpty) {
+                          return Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12.0),
+                              child: Text(
+                                "Tidak ada data agen",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
+                        return Column(
+                          children: rekapList.map<Widget>((item) {
+                            final String nama = item["nama_agen"] ?? "-";
+                            final String pesanan = "${item["total_pesanan"]} Pesanan";
+                            final double pemasukan = double.tryParse(item["total_pemasukan"].toString()) ?? 0;
+
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor: const Color(0xFFEBF5FF),
+                                    child: Text(
+                                      nama.isNotEmpty ? nama[0].toUpperCase() : "A",
+                                      style: GoogleFonts.poppins(
+                                        color: const Color(0xFF0060A9),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          nama,
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13,
+                                            color: const Color(0xFF2C3E50),
+                                          ),
+                                        ),
+                                        Text(
+                                          pesanan,
+                                          style: GoogleFonts.poppins(
+                                            color: Colors.grey.shade500,
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Text(
+                                    rupiah.format(pemasukan),
+                                    style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                      color: Colors.green.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+
+                  // Unduh Laporan PDF Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        PdfService.cetakLaporanAdmin(
+                          rekapAgen: laporan["rekap_agen"] ?? [],
+                          totalPembeli: int.tryParse(laporan["total_pembeli"].toString()) ?? 0,
+                          totalAgen: int.tryParse(laporan["total_agen"].toString()) ?? 0,
+                          totalPesanan: int.tryParse(laporan["total_pesanan"].toString()) ?? 0,
+                          totalPendapatan: double.tryParse(laporan["total_pendapatan"].toString()) ?? 0,
+                          menunggu: int.tryParse(laporan["menunggu"].toString()) ?? 0,
+                          diproses: int.tryParse(laporan["diproses"].toString()) ?? 0,
+                          selesai: int.tryParse(laporan["selesai"].toString()) ?? 0,
+                        );
+                      },
+                      icon: const Icon(Icons.picture_as_pdf_outlined, size: 20),
+                      label: Text(
+                        "Unduh Laporan PDF",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFD32F2F),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 30),
