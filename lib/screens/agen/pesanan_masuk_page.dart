@@ -1,5 +1,6 @@
 import 'package:appfreshfish/config/api.dart';
 import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -42,6 +43,103 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
         isLoading = false;
       });
     }
+  }
+
+  void _showContactDialog(BuildContext context, String noHp, String nama) {
+    String formattedPhone = noHp.replaceAll(RegExp(r'[^0-9]'), '');
+    if (formattedPhone.startsWith('0')) {
+      formattedPhone = '62' + formattedPhone.substring(1);
+    }
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Hubungi Pembeli",
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF2C3E50),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "Pilih metode untuk menghubungi $nama ($noHp)",
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              // WhatsApp Option
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE8F5E9),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.chat_bubble_outline, color: Colors.green),
+                ),
+                title: Text(
+                  "Kirim WhatsApp",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF2C3E50),
+                  ),
+                ),
+                subtitle: Text("Hubungi via chat WhatsApp", style: GoogleFonts.poppins(fontSize: 11)),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final url = Uri.parse("https://wa.me/$formattedPhone");
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  }
+                },
+              ),
+              const Divider(),
+              
+              // Direct Call Option
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE3F2FD),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.phone_outlined, color: Colors.blue),
+                ),
+                title: Text(
+                  "Telepon Langsung",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF2C3E50),
+                  ),
+                ),
+                subtitle: Text("Panggil nomor telepon biasa", style: GoogleFonts.poppins(fontSize: 11)),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final phoneUrl = Uri.parse("tel:${noHp.replaceAll(RegExp(r'[^0-9+]'), '')}");
+                  if (await canLaunchUrl(phoneUrl)) {
+                    await launchUrl(phoneUrl);
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -406,6 +504,37 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                                               fontSize: 12,
                                             ),
                                           ),
+                                          if (item["no_telp"] != null && item["no_telp"].toString().isNotEmpty) ...[
+                                            const SizedBox(height: 2),
+                                            GestureDetector(
+                                              onTap: () {
+                                                _showContactDialog(
+                                                  context,
+                                                  item["no_telp"].toString(),
+                                                  item["nama_lengkap"] ?? "-",
+                                                );
+                                              },
+                                              child: Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.phone_android,
+                                                    size: 13,
+                                                    color: Color(0xFF0060A9),
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    item["no_telp"].toString(),
+                                                    style: GoogleFonts.poppins(
+                                                      color: const Color(0xFF0060A9),
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w600,
+                                                      decoration: TextDecoration.underline,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                           const SizedBox(height: 10),
                                           Row(
                                             children: [

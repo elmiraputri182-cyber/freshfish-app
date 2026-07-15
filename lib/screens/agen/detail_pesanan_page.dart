@@ -1,5 +1,6 @@
 import 'package:appfreshfish/config/api.dart';
 import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -21,6 +22,103 @@ class _DetailPesananPageState extends State<DetailPesananPage> {
     symbol: "Rp ",
     decimalDigits: 0,
   );
+
+  void _showContactDialog(BuildContext context, String noHp, String nama) {
+    String formattedPhone = noHp.replaceAll(RegExp(r'[^0-9]'), '');
+    if (formattedPhone.startsWith('0')) {
+      formattedPhone = '62' + formattedPhone.substring(1);
+    }
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Hubungi Pembeli",
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF2C3E50),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "Pilih metode untuk menghubungi $nama ($noHp)",
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              // WhatsApp Option
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE8F5E9),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.chat_bubble_outline, color: Colors.green),
+                ),
+                title: Text(
+                  "Kirim WhatsApp",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF2C3E50),
+                  ),
+                ),
+                subtitle: Text("Hubungi via chat WhatsApp", style: GoogleFonts.poppins(fontSize: 11)),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final url = Uri.parse("https://wa.me/$formattedPhone");
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  }
+                },
+              ),
+              const Divider(),
+              
+              // Direct Call Option
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE3F2FD),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.phone_outlined, color: Colors.blue),
+                ),
+                title: Text(
+                  "Telepon Langsung",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF2C3E50),
+                  ),
+                ),
+                subtitle: Text("Panggil nomor telepon biasa", style: GoogleFonts.poppins(fontSize: 11)),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final phoneUrl = Uri.parse("tel:${noHp.replaceAll(RegExp(r'[^0-9+]'), '')}");
+                  if (await canLaunchUrl(phoneUrl)) {
+                    await launchUrl(phoneUrl);
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   List detailPesanan = [];
   bool isLoading = true;
@@ -240,11 +338,40 @@ class _DetailPesananPageState extends State<DetailPesananPage> {
                           widget.data["nama_lengkap"] ?? "-",
                         ),
                         const SizedBox(height: 8),
-                        detailItem(
-                          Icons.phone_outlined,
-                          Colors.purple,
-                          "No HP",
-                          widget.data["no_telp"] ?? "-",
+                        GestureDetector(
+                          onTap: () {
+                            final noHp = widget.data["no_telp"]?.toString();
+                            if (noHp != null && noHp.isNotEmpty && noHp != "-") {
+                              _showContactDialog(
+                                context,
+                                noHp,
+                                widget.data["nama_lengkap"] ?? "-",
+                              );
+                            }
+                          },
+                          child: Row(
+                            children: [
+                              const Icon(Icons.phone_outlined, color: Colors.purple, size: 14),
+                              const SizedBox(width: 8),
+                              Text(
+                                "No HP:",
+                                style: GoogleFonts.poppins(color: Colors.grey.shade500, fontSize: 12),
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  widget.data["no_telp"] ?? "-",
+                                  textAlign: TextAlign.right,
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                    color: const Color(0xFF0060A9),
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 8),
                         detailItem(
