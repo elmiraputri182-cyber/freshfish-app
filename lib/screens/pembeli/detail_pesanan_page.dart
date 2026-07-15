@@ -1,4 +1,5 @@
 import 'package:appfreshfish/config/api.dart';
+import 'package:appfreshfish/services/pdf_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -409,6 +410,45 @@ class DetailPesananPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 35),
+
+            // Print Invoice Button
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFD32F2F), // PDF theme red
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                ),
+                onPressed: () {
+                  final List itemsList = [];
+                  if (listItems != null && listItems.isNotEmpty) {
+                    itemsList.addAll(listItems);
+                  } else {
+                    itemsList.add({
+                      "nama_ikan": data["nama_ikan"] ?? "-",
+                      "harga": data["harga"] ?? 0,
+                      "jumlah": data["jumlah_kg"] ?? 1,
+                      "subtotal": data["total_harga"] ?? 0,
+                    });
+                  }
+                  PdfService.cetakInvoice(data: data, items: itemsList);
+                },
+                icon: const Icon(Icons.picture_as_pdf_outlined, color: Colors.white),
+                label: Text(
+                  "Unduh Invoice PDF",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
 
             // Back Button
             SizedBox(
