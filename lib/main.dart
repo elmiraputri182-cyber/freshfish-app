@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'screens/splash/splash_screen.dart';
-import 'screens/auth/login_page.dart';
-import 'screens/pembeli/home_page.dart';
+import 'package:appfreshfish/screens/splash/splash_screen.dart';
+import 'package:appfreshfish/screens/auth/login_page.dart';
+import 'package:appfreshfish/screens/pembeli/home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 
