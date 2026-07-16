@@ -157,10 +157,14 @@ class _RiwayatPageState extends State<RiwayatPage> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "PESANAN FRESH",
+                                        item["jenis_pesanan"]?.toString().toLowerCase().trim() == "preorder"
+                                            ? "PESANAN PRE-ORDER"
+                                            : "PESANAN FRESH",
                                         style: GoogleFonts.poppins(
                                           fontSize: 9,
-                                          color: Colors.grey.shade500,
+                                          color: item["jenis_pesanan"]?.toString().toLowerCase().trim() == "preorder"
+                                              ? Colors.orange.shade700
+                                              : Colors.grey.shade500,
                                           fontWeight: FontWeight.w600,
                                           letterSpacing: 0.5,
                                         ),
