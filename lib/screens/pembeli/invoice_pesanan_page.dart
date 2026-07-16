@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:appfreshfish/services/pdf_service.dart';
 
 class InvoicePesananPage extends StatelessWidget {
   final Map data;
@@ -166,8 +165,8 @@ class InvoicePesananPage extends StatelessWidget {
                     ...listItems.map((item) {
                       final name = item["nama_ikan"] ?? "-";
                       final price = double.tryParse(item["harga"].toString()) ?? 0;
-                      final kg = double.tryParse(item["jumlah_kg"].toString()) ?? 0;
-                      final itemTotal = double.tryParse(item["total_harga"].toString()) ?? (price * kg);
+                      final kg = double.tryParse(item["jumlah_pesan"]?.toString() ?? item["jumlah_kg"]?.toString() ?? "0") ?? 0;
+                      final itemTotal = double.tryParse(item["subtotal"]?.toString() ?? item["total_harga"]?.toString() ?? "0") ?? (price * kg);
 
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16),
@@ -274,37 +273,6 @@ class InvoicePesananPage extends StatelessWidget {
                     ],
                   ),
                 ],
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            // Download PDF Button
-            SizedBox(
-              width: double.infinity,
-              height: 54,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0060A9),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                ),
-                onPressed: () {
-                  PdfService.cetakInvoice(
-                    data: data,
-                    items: data["items"] as List? ?? [],
-                  );
-                },
-                icon: const Icon(Icons.picture_as_pdf_outlined),
-                label: Text(
-                  "Unduh / Bagikan Invoice PDF",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
               ),
             ),
           ],
