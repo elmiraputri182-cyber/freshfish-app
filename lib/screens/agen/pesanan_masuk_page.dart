@@ -45,7 +45,7 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
     }
   }
 
-  void _showContactDialog(BuildContext context, String noHp, String nama) {
+  void _showContactDialog(BuildContext context, String noHp, String nama, {String? idPesanan, String? namaIkan}) {
     String formattedPhone = noHp.replaceAll(RegExp(r'[^0-9]'), '');
     if (formattedPhone.startsWith('0')) {
       formattedPhone = '62' + formattedPhone.substring(1);
@@ -101,7 +101,20 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                 subtitle: Text("Hubungi via chat WhatsApp", style: GoogleFonts.poppins(fontSize: 11)),
                 onTap: () async {
                   Navigator.pop(context);
-                  final url = Uri.parse("https://wa.me/$formattedPhone");
+                  final pref = await SharedPreferences.getInstance();
+                  final namaAgen = pref.getString("nama") ?? pref.getString("nama_lengkap") ?? "Agen";
+                  
+                  String message = "Halo $nama, kami dari Agen $namaAgen ingin mengonfirmasi pesanan Anda";
+                  if (namaIkan != null && namaIkan.isNotEmpty) {
+                    message += " ($namaIkan)";
+                  }
+                  if (idPesanan != null && idPesanan.isNotEmpty) {
+                    message += " dengan Kode Pesanan #$idPesanan";
+                  }
+                  message += ". Mohon ditunggu ya.";
+                  
+                  final textEncoded = Uri.encodeComponent(message);
+                  final url = Uri.parse("https://wa.me/$formattedPhone?text=$textEncoded");
                   try {
                     await launchUrl(url, mode: LaunchMode.externalApplication);
                   } catch (e) {
@@ -516,6 +529,8 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                                                   context,
                                                   item["no_telp"].toString(),
                                                   item["nama_lengkap"] ?? "-",
+                                                  idPesanan: item["id_pesanan"]?.toString(),
+                                                  namaIkan: displayNamaIkan,
                                                 );
                                               },
                                               child: Row(

@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import '../../services/update_status_service.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailPesananPage extends StatefulWidget {
   final Map data;
@@ -23,7 +24,7 @@ class _DetailPesananPageState extends State<DetailPesananPage> {
     decimalDigits: 0,
   );
 
-  void _showContactDialog(BuildContext context, String noHp, String nama) {
+  void _showContactDialog(BuildContext context, String noHp, String nama, {String? idPesanan, String? namaIkan}) {
     String formattedPhone = noHp.replaceAll(RegExp(r'[^0-9]'), '');
     if (formattedPhone.startsWith('0')) {
       formattedPhone = '62' + formattedPhone.substring(1);
@@ -79,7 +80,20 @@ class _DetailPesananPageState extends State<DetailPesananPage> {
                 subtitle: Text("Hubungi via chat WhatsApp", style: GoogleFonts.poppins(fontSize: 11)),
                 onTap: () async {
                   Navigator.pop(context);
-                  final url = Uri.parse("https://wa.me/$formattedPhone");
+                  final pref = await SharedPreferences.getInstance();
+                  final namaAgen = pref.getString("nama") ?? pref.getString("nama_lengkap") ?? "Agen";
+                  
+                  String message = "Halo $nama, kami dari Agen $namaAgen ingin mengonfirmasi pesanan Anda";
+                  if (namaIkan != null && namaIkan.isNotEmpty) {
+                    message += " ($namaIkan)";
+                  }
+                  if (idPesanan != null && idPesanan.isNotEmpty) {
+                    message += " dengan Kode Pesanan #$idPesanan";
+                  }
+                  message += ". Mohon ditunggu ya.";
+                  
+                  final textEncoded = Uri.encodeComponent(message);
+                  final url = Uri.parse("https://wa.me/$formattedPhone?text=$textEncoded");
                   try {
                     await launchUrl(url, mode: LaunchMode.externalApplication);
                   } catch (e) {
@@ -350,6 +364,8 @@ class _DetailPesananPageState extends State<DetailPesananPage> {
                                 context,
                                 noHp,
                                 widget.data["nama_lengkap"] ?? "-",
+                                idPesanan: widget.data["id_pesanan"]?.toString(),
+                                namaIkan: displayNamaIkan,
                               );
                             }
                           },
