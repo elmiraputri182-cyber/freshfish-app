@@ -62,7 +62,7 @@ class _LaporanAgenPageState extends State<LaporanAgenPage> {
       if (json["success"] == true) {
         laporan = json["data"];
         totalPesanan = int.tryParse(json["total_pesanan"].toString()) ?? 0;
-        totalPemasukan = int.tryParse(json["total_pemasukan"].toString()) ?? 0;
+        totalPemasukan = (double.tryParse(json["total_pemasukan"].toString()) ?? 0).toInt();
         totalKg = 0;
 
         Set<String> pembeli = {};
@@ -489,7 +489,7 @@ class _LaporanAgenPageState extends State<LaporanAgenPage> {
               ),
               Text(
                 rupiah.format(
-                  int.tryParse(item["total_harga"].toString()) ?? 0,
+                  (double.tryParse(item["total_harga"].toString()) ?? 0).toInt(),
                 ),
                 style: GoogleFonts.poppins(
                   color: const Color(0xFF4CAF50),
