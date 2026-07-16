@@ -334,7 +334,7 @@ class _TambahIkanPageState extends State<TambahIkanPage> {
                       kategori = value!;
                       // Reset selectedNamaIkan if not in the new category
                       final filtered = listMasterIkan
-                          .where((item) => item["kategori"]?.toString() == kategori)
+                          .where((item) => (item["kategori"]?.toString() ?? "Ikan Laut") == kategori)
                           .toList();
                       final found = filtered.any((item) => item["nama_ikan"].toString() == selectedNamaIkan);
                       if (!found) {
@@ -377,7 +377,7 @@ class _TambahIkanPageState extends State<TambahIkanPage> {
                   validator: (value) => value == null ? "Silakan pilih nama ikan" : null,
                   style: GoogleFonts.poppins(color: Colors.black87, fontSize: 14),
                   items: listMasterIkan
-                      .where((item) => item["kategori"]?.toString() == kategori)
+                      .where((item) => (item["kategori"]?.toString() ?? "Ikan Laut") == kategori)
                       .map<DropdownMenuItem<String>>((item) {
                     final nama = item["nama_ikan"].toString();
                     return DropdownMenuItem<String>(

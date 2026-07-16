@@ -279,7 +279,7 @@ class _EditIkanPageState extends State<EditIkanPage> {
                         kategori = value;
                         // Reset selectedNamaIkan if not in the new category
                         final filtered = listMasterIkan
-                            .where((item) => item["kategori"]?.toString() == kategori)
+                            .where((item) => (item["kategori"]?.toString() ?? "Ikan Laut") == kategori)
                             .toList();
                         final found = filtered.any((item) => item["nama_ikan"].toString() == selectedNamaIkan);
                         if (!found) {
@@ -310,7 +310,7 @@ class _EditIkanPageState extends State<EditIkanPage> {
                   decoration: const InputDecoration(border: InputBorder.none),
                   style: GoogleFonts.poppins(fontSize: 14, color: const Color(0xFF2C3E50), fontWeight: FontWeight.bold),
                   items: listMasterIkan
-                      .where((item) => item["kategori"]?.toString() == kategori)
+                      .where((item) => (item["kategori"]?.toString() ?? "Ikan Laut") == kategori)
                       .map<DropdownMenuItem<String>>((item) {
                     final n = item["nama_ikan"].toString();
                     return DropdownMenuItem<String>(
