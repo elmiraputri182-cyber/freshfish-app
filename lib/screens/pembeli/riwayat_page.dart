@@ -156,19 +156,24 @@ class _RiwayatPageState extends State<RiwayatPage> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        item["jenis_pesanan"]?.toString().toLowerCase().trim() == "preorder"
-                                            ? "PESANAN PRE-ORDER"
-                                            : "PESANAN FRESH",
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 9,
-                                          color: item["jenis_pesanan"]?.toString().toLowerCase().trim() == "preorder"
-                                              ? Colors.orange.shade700
-                                              : Colors.grey.shade500,
-                                          fontWeight: FontWeight.w600,
-                                          letterSpacing: 0.5,
+                                      Expanded(
+                                        child: Text(
+                                          item["jenis_pesanan"]?.toString().toLowerCase().trim() == "preorder"
+                                              ? "PESANAN PRE-ORDER"
+                                              : "PESANAN FRESH",
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 9,
+                                            color: item["jenis_pesanan"]?.toString().toLowerCase().trim() == "preorder"
+                                                ? Colors.orange.shade700
+                                                : Colors.grey.shade500,
+                                            fontWeight: FontWeight.w600,
+                                            letterSpacing: 0.5,
+                                          ),
                                         ),
                                       ),
+                                      const SizedBox(width: 8),
                                       // Status Badge
                                       Container(
                                         padding: const EdgeInsets.symmetric(

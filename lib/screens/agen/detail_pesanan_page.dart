@@ -327,19 +327,18 @@ class _DetailPesananPageState extends State<DetailPesananPage> {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color:
-                                    widget.data["jenis_pesanan"] == "Pre Order"
+                                color: widget.data["jenis_pesanan"]?.toString().toLowerCase().replaceAll(' ', '') == "preorder"
                                     ? Colors.orange.shade50
                                     : Colors.blue.shade50,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                widget.data["jenis_pesanan"] ?? "-",
+                                widget.data["jenis_pesanan"]?.toString().toLowerCase().replaceAll(' ', '') == "preorder"
+                                    ? "PRE-ORDER"
+                                    : "ORDER",
                                 style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.bold,
-                                  color:
-                                      widget.data["jenis_pesanan"] ==
-                                          "Pre Order"
+                                  color: widget.data["jenis_pesanan"]?.toString().toLowerCase().replaceAll(' ', '') == "preorder"
                                       ? Colors.orange.shade800
                                       : Colors.blue.shade800,
                                   fontSize: 11,
@@ -433,7 +432,7 @@ class _DetailPesananPageState extends State<DetailPesananPage> {
                           "Pengambilan",
                           widget.data["metode_pengambilan"] ?? "-",
                         ),
-                        if (widget.data["jenis_pesanan"] == "Pre Order") ...[
+                        if (widget.data["jenis_pesanan"]?.toString().toLowerCase().replaceAll(' ', '') == "preorder") ...[
                           const SizedBox(height: 8),
                           detailItem(
                             Icons.calendar_today_outlined,

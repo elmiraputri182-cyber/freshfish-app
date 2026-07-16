@@ -50,20 +50,22 @@ class InvoicePesananPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Blue Header Banner Card
+            // Header Banner Card with distinct styles
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF0080FF), Color(0xFF0060A9)],
+                gradient: LinearGradient(
+                  colors: isPreOrder
+                      ? [const Color(0xFFFF9800), const Color(0xFFF57C00)] // Warm orange/amber for Pre-Orders
+                      : [const Color(0xFF0080FF), const Color(0xFF0060A9)], // Sleek blue for Fresh Orders
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF0060A9).withOpacity(0.2),
+                    color: (isPreOrder ? Colors.orange : const Color(0xFF0060A9)).withOpacity(0.2),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
@@ -72,18 +74,25 @@ class InvoicePesananPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    isPreOrder ? "FRESH FISH - PRE-ORDER" : "FRESH FISH",
-                    style: GoogleFonts.poppins(
-                      color: Colors.white.withOpacity(0.9),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.2,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Text(
+                      isPreOrder ? "INVOICE PRE-ORDER" : "INVOICE FRESH ORDER",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.0,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 12),
                   Text(
-                    "Invoice #$idPesanan",
+                    isPreOrder ? "Pre-Order #$idPesanan" : "Invoice #$idPesanan",
                     style: GoogleFonts.poppins(
                       color: Colors.white,
                       fontSize: 22,

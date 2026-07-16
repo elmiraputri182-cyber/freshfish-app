@@ -146,13 +146,19 @@ class DetailPesananPage extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEBF5FF),
+                          color: (data["jenis_pesanan"]?.toString().toLowerCase().replaceAll(' ', '') == "preorder")
+                              ? Colors.orange.shade50
+                              : const Color(0xFFEBF5FF),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          (data["jenis_pesanan"] ?? "order").toString().toLowerCase(),
+                          (data["jenis_pesanan"]?.toString().toLowerCase().replaceAll(' ', '') == "preorder")
+                              ? "PRE-ORDER"
+                              : "BELI LANGSUNG",
                           style: GoogleFonts.poppins(
-                            color: const Color(0xFF0060A9),
+                            color: (data["jenis_pesanan"]?.toString().toLowerCase().replaceAll(' ', '') == "preorder")
+                                ? Colors.orange.shade700
+                                : const Color(0xFF0060A9),
                             fontWeight: FontWeight.bold,
                             fontSize: 11,
                           ),
