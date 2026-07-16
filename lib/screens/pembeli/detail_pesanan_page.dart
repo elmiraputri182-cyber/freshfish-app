@@ -3,6 +3,7 @@ import 'package:appfreshfish/services/pdf_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'invoice_pesanan_page.dart';
 
 class DetailPesananPage extends StatelessWidget {
   final rupiah = NumberFormat.currency(
@@ -59,6 +60,19 @@ class DetailPesananPage extends StatelessWidget {
             color: const Color(0xFF2C3E50),
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.receipt_long_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => InvoicePesananPage(data: data),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
