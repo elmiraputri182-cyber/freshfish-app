@@ -77,217 +77,142 @@ class PdfService {
     double totalHarga = double.tryParse(data["total_pembayaran"]?.toString() ?? "") ?? 
                          double.tryParse(data["total_harga"]?.toString() ?? "") ?? 0;
 
+    final idPesanan = data["id_pesanan"]?.toString() ?? "-";
+    final tanggal = data["tanggal"]?.toString() ?? "-";
+    final namaPembeli = data["nama_pembeli"] ?? data["nama_lengkap"] ?? "-";
+    final namaAgen = data["nama_agen"] ?? "-";
+    final metodePembayaran = data["metode_pembayaran"]?.toString().toUpperCase() ?? "CASH";
+    final metodePengambilan = data["metode_pengambilan"]?.toString().toUpperCase() ?? "COD";
+
     pdf.addPage(
       pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(36),
+        pageFormat: PdfPageFormat.roll80,
+        margin: const pw.EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         build: (pw.Context context) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              // Header
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Column(
+              // Header Toko
+              pw.Center(
+                child: pw.Column(
+                  children: [
+                    pw.Text(
+                      "FRESH FISH BENGKALIS",
+                      style: pw.TextStyle(
+                        fontSize: 12,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                      textAlign: pw.TextAlign.center,
+                    ),
+                    pw.SizedBox(height: 2),
+                    pw.Text(
+                      "Segar & Langsung Dari Nelayan",
+                      style: const pw.TextStyle(fontSize: 8),
+                      textAlign: pw.TextAlign.center,
+                    ),
+                    pw.Text(
+                      "Bengkalis, Riau",
+                      style: const pw.TextStyle(fontSize: 8),
+                      textAlign: pw.TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              
+              pw.SizedBox(height: 6),
+              pw.Text("------------------------------------------", style: const pw.TextStyle(fontSize: 8)),
+              pw.SizedBox(height: 4),
+
+              // Metadata Transaksi
+              pw.Text("No. Invoice : #$idPesanan", style: const pw.TextStyle(fontSize: 8)),
+              pw.Text("Tanggal     : $tanggal", style: const pw.TextStyle(fontSize: 8)),
+              pw.Text("Pembeli     : $namaPembeli", style: const pw.TextStyle(fontSize: 8)),
+              pw.Text("Agen        : $namaAgen", style: const pw.TextStyle(fontSize: 8)),
+              pw.Text("Bayar/Ambil : $metodePembayaran / $metodePengambilan", style: const pw.TextStyle(fontSize: 8)),
+              
+              pw.SizedBox(height: 4),
+              pw.Text("------------------------------------------", style: const pw.TextStyle(fontSize: 8)),
+              pw.SizedBox(height: 6),
+
+              // Daftar Item Belanja
+              pw.Text("DAFTAR BELANJA:", style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+              pw.SizedBox(height: 4),
+
+              ...List.generate(items.length, (index) {
+                final item = items[index];
+                final String nama = item["nama_ikan"] ?? "-";
+                final double qty = double.tryParse((item["jumlah_pesan"] ?? item["jumlah"] ?? "0").toString()) ?? 0;
+                final double harga = double.tryParse(item["harga"].toString()) ?? 0;
+                final double sub = double.tryParse(item["subtotal"].toString()) ?? (harga * qty);
+
+                return pw.Padding(
+                  padding: const pw.EdgeInsets.only(bottom: 6),
+                  child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Text(
-                        "FRESH FISH BENGKALIS",
-                        style: pw.TextStyle(
-                          fontSize: 20,
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColor.fromHex("#0060A9"),
-                        ),
+                        nama,
+                        style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
                       ),
-                      pw.SizedBox(height: 4),
-                      pw.Text("Segar, Terpercaya, dan Langsung dari Nelayan", style: const pw.TextStyle(fontSize: 10)),
-                    ],
-                  ),
-                  pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.end,
-                    children: [
-                      pw.Text(
-                        "INVOICE PEMBELIAN",
-                        style: pw.TextStyle(
-                          fontSize: 16,
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColor.fromHex("#2C3E50"),
-                        ),
-                      ),
-                      pw.SizedBox(height: 4),
-                      pw.Text("ID: #${data["id_pesanan"]}", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
-                    ],
-                  ),
-                ],
-              ),
-              pw.SizedBox(height: 12),
-              pw.Divider(thickness: 2, color: PdfColor.fromHex("#E5E7EB")),
-              pw.SizedBox(height: 16),
-
-              // Rincian Pembeli & Agen
-              pw.Row(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Expanded(
-                    child: pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: [
-                        pw.Text(
-                          "Penerima (Pembeli):",
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11),
-                        ),
-                        pw.SizedBox(height: 4),
-                        pw.Text(data["nama_pembeli"] ?? data["nama_lengkap"] ?? "-", style: const pw.TextStyle(fontSize: 10)),
-                        pw.Text("HP: ${data["no_hp_pembeli"] ?? data["no_telp"] ?? "-"}", style: const pw.TextStyle(fontSize: 10)),
-                        pw.Text("Alamat: ${data["alamat"] ?? "-"}", style: const pw.TextStyle(fontSize: 10)),
-                      ],
-                    ),
-                  ),
-                  pw.Expanded(
-                    child: pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: [
-                        pw.Text(
-                          "Informasi Transaksi:",
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11),
-                        ),
-                        pw.SizedBox(height: 4),
-                        pw.Text("Tanggal Order: ${data["tanggal"] ?? "-"}", style: const pw.TextStyle(fontSize: 10)),
-                        pw.Text("Metode Pembayaran: ${data["metode_pembayaran"].toString().toUpperCase()}", style: const pw.TextStyle(fontSize: 10)),
-                        pw.Text("Metode Pengambilan: ${data["metode_pengambilan"].toString().toUpperCase()}", style: const pw.TextStyle(fontSize: 10)),
-                        pw.Text("Agen Penjual: ${data["nama_agen"] ?? "-"}", style: const pw.TextStyle(fontSize: 10)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              pw.SizedBox(height: 24),
-
-              // Tabel Item Pesanan
-              pw.Text(
-                "Rincian Produk",
-                style: pw.TextStyle(
-                  fontSize: 12,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColor.fromHex("#2C3E50"),
-                ),
-              ),
-              pw.SizedBox(height: 8),
-
-              // Table
-              pw.Table(
-                border: pw.TableBorder.all(color: PdfColor.fromHex("#E5E7EB"), width: 0.5),
-                columnWidths: {
-                  0: const pw.FixedColumnWidth(40),
-                  1: const pw.FlexColumnWidth(),
-                  2: const pw.FixedColumnWidth(100),
-                  3: const pw.FixedColumnWidth(80),
-                  4: const pw.FixedColumnWidth(100),
-                },
-                children: [
-                  // Table Header
-                  pw.TableRow(
-                    decoration: pw.BoxDecoration(color: PdfColor.fromHex("#F3F4F6")),
-                    children: [
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8),
-                        child: pw.Text("No", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8),
-                        child: pw.Text("Nama Produk", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8),
-                        child: pw.Text("Harga / Kg", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10), textAlign: pw.TextAlign.right),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8),
-                        child: pw.Text("Jumlah", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10), textAlign: pw.TextAlign.center),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8),
-                        child: pw.Text("Subtotal", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10), textAlign: pw.TextAlign.right),
-                      ),
-                    ],
-                  ),
-                  // Table Items
-                  ...List.generate(items.length, (index) {
-                    final item = items[index];
-                    final String nama = item["nama_ikan"] ?? "-";
-                    final String qty = (item["jumlah_pesan"] ?? item["jumlah"] ?? "-").toString();
-                    final double harga = double.tryParse(item["harga"].toString()) ?? 0;
-                    final double sub = double.tryParse(item["subtotal"].toString()) ?? 0;
-
-                    return pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8),
-                          child: pw.Text("${index + 1}", style: const pw.TextStyle(fontSize: 10)),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8),
-                          child: pw.Text(nama, style: const pw.TextStyle(fontSize: 10)),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8),
-                          child: pw.Text(rupiah.format(harga), style: const pw.TextStyle(fontSize: 10), textAlign: pw.TextAlign.right),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8),
-                          child: pw.Text("$qty Kg", style: const pw.TextStyle(fontSize: 10), textAlign: pw.TextAlign.center),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8),
-                          child: pw.Text(rupiah.format(sub), style: const pw.TextStyle(fontSize: 10), textAlign: pw.TextAlign.right),
-                        ),
-                      ],
-                    );
-                  }),
-                ],
-              ),
-              pw.SizedBox(height: 16),
-
-              // Total Section
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.end,
-                children: [
-                  pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.end,
-                    children: [
                       pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                         children: [
                           pw.Text(
-                            "Total Pembayaran: ",
-                            style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex("#2C3E50")),
+                            "${qty.toStringAsFixed(0)} Kg x ${rupiah.format(harga).replaceAll('Rp ', '')}",
+                            style: const pw.TextStyle(fontSize: 8),
                           ),
                           pw.Text(
-                            rupiah.format(totalHarga),
-                            style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex("#0060A9")),
+                            rupiah.format(sub).replaceAll('Rp ', ''),
+                            style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
                           ),
                         ],
                       ),
                     ],
                   ),
+                );
+              }),
+
+              pw.SizedBox(height: 4),
+              pw.Text("------------------------------------------", style: const pw.TextStyle(fontSize: 8)),
+              pw.SizedBox(height: 6),
+
+              // Total Belanja
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    "TOTAL BELANJA",
+                    style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
+                  ),
+                  pw.Text(
+                    rupiah.format(totalHarga),
+                    style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+                  ),
                 ],
               ),
-              pw.Spacer(),
+
+              pw.SizedBox(height: 6),
+              pw.Text("------------------------------------------", style: const pw.TextStyle(fontSize: 8)),
+              pw.SizedBox(height: 10),
 
               // Footer
-              pw.Divider(thickness: 1, color: PdfColor.fromHex("#E5E7EB")),
-              pw.SizedBox(height: 8),
               pw.Center(
-                child: pw.Text(
-                  "Terima kasih telah berbelanja di Fresh Fish Bengkalis!",
-                  style: pw.TextStyle(fontSize: 10, fontStyle: pw.FontStyle.italic, color: PdfColor.fromHex("#6B7280")),
-                ),
-              ),
-              pw.SizedBox(height: 4),
-              pw.Center(
-                child: pw.Text(
-                  "Dicetak otomatis oleh sistem pada $sekarang",
-                  style: pw.TextStyle(fontSize: 8, color: PdfColor.fromHex("#9CA3AF")),
+                child: pw.Column(
+                  children: [
+                    pw.Text(
+                      "TERIMA KASIH",
+                      style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
+                    ),
+                    pw.Text(
+                      "Sudah Berbelanja di Toko Kami!",
+                      style: const pw.TextStyle(fontSize: 8),
+                    ),
+                    pw.SizedBox(height: 4),
+                    pw.Text(
+                      "Dicetak pada: $sekarang",
+                      style: const pw.TextStyle(fontSize: 7),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -298,7 +223,7 @@ class PdfService {
 
     await Printing.layoutPdf(
       onLayout: (format) async => pdf.save(),
-      name: "Invoice #${data["kode_pesanan"] ?? data["id_pesanan"]}",
+      name: "Struk-Invoice-$idPesanan",
     );
   }
 
