@@ -16,6 +16,7 @@ import 'laporan_admin_page.dart';
 import '../operasional/operasional_page.dart';
 import 'data_user/data_pembeli_page.dart';
 import 'data_user/data_agen_page.dart';
+import 'master_ikan_page.dart';
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
@@ -434,6 +435,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         "Laporan transaksi periodik admin & agen",
                         Colors.purple.shade600,
                         const LaporanAdminPage(),
+                      ),
+                      buildMenuCard(
+                        context,
+                        Icons.collections_bookmark_outlined,
+                        "Kelola Master Ikan",
+                        "Kelola standarisasi daftar nama ikan platform",
+                        Colors.indigo.shade600,
+                        const MasterIkanPage(),
                       ),
                       const SizedBox(height: 32),
 

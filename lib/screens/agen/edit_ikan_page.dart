@@ -25,6 +25,8 @@ class _EditIkanPageState extends State<EditIkanPage> {
 
   String kategori = "Ikan Laut";
   bool isLoading = false;
+  List listMasterIkan = [];
+  String? selectedNamaIkan;
 
   @override
   void initState() {
@@ -33,6 +35,33 @@ class _EditIkanPageState extends State<EditIkanPage> {
     jumlah = TextEditingController(text: widget.ikan["jumlah"]);
     harga = TextEditingController(text: widget.ikan["harga"]);
     kategori = widget.ikan["kategori"] ?? "Ikan Laut";
+    selectedNamaIkan = widget.ikan["nama_ikan"];
+    fetchMasterIkan();
+  }
+
+  Future<void> fetchMasterIkan() async {
+    try {
+      final response = await http.get(
+        Uri.parse("${Api.baseUrl}/admin/get_master_ikan.php"),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data["success"] == true) {
+          setState(() {
+            listMasterIkan = data["data"] ?? [];
+            final exists = listMasterIkan.any((item) => item["nama_ikan"] == selectedNamaIkan);
+            if (!exists && selectedNamaIkan != null) {
+              listMasterIkan.add({
+                "id_master": 0,
+                "nama_ikan": selectedNamaIkan
+              });
+            }
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   @override
@@ -216,8 +245,38 @@ class _EditIkanPageState extends State<EditIkanPage> {
                       ),
               ),
             ),
-            const SizedBox(height: 16),
-            _buildField(nama, "Nama Ikan"),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButtonFormField<String>(
+                  value: selectedNamaIkan,
+                  isExpanded: true,
+                  hint: Text(
+                    "Pilih Nama Ikan",
+                    style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey.shade500),
+                  ),
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  style: GoogleFonts.poppins(fontSize: 14, color: const Color(0xFF2C3E50), fontWeight: FontWeight.bold),
+                  items: listMasterIkan.map<DropdownMenuItem<String>>((item) {
+                    final n = item["nama_ikan"].toString();
+                    return DropdownMenuItem<String>(
+                      value: n,
+                      child: Text(n),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedNamaIkan = value;
+                      nama.text = value ?? "";
+                    });
+                  },
+                ),
+              ),
+            ),
             const SizedBox(height: 12),
             Container(
               decoration: BoxDecoration(

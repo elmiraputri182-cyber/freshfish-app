@@ -37,3 +37,12 @@ SET
     nama_lengkap = 'Administrator Utama',
     no_telp = '081234567890'
 WHERE role = 'admin';
+
+-- ========================================================
+-- 4. Membuat Tabel 'master_ikan' untuk Daftar Nama Ikan Standar
+-- ========================================================
+CREATE TABLE IF NOT EXISTS master_ikan (
+    id_master INT AUTO_INCREMENT PRIMARY KEY,
+    nama_ikan VARCHAR(100) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
