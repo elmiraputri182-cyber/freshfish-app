@@ -60,11 +60,11 @@ class _MasterIkanPageState extends State<MasterIkanPage> {
     });
   }
 
-  Future<void> tambahIkan(String nama) async {
+  Future<void> tambahIkan(String nama, String kategori) async {
     try {
       final response = await http.post(
         Uri.parse("${Api.baseUrl}/admin/tambah_master_ikan.php"),
-        body: {"nama_ikan": nama},
+        body: {"nama_ikan": nama, "kategori": kategori},
       );
 
       final data = jsonDecode(response.body);
@@ -89,11 +89,11 @@ class _MasterIkanPageState extends State<MasterIkanPage> {
     }
   }
 
-  Future<void> editIkan(int id, String nama) async {
+  Future<void> editIkan(int id, String nama, String kategori) async {
     try {
       final response = await http.post(
         Uri.parse("${Api.baseUrl}/admin/edit_master_ikan.php"),
-        body: {"id_master": id.toString(), "nama_ikan": nama},
+        body: {"id_master": id.toString(), "nama_ikan": nama, "kategori": kategori},
       );
 
       final data = jsonDecode(response.body);
@@ -147,70 +147,105 @@ class _MasterIkanPageState extends State<MasterIkanPage> {
     }
   }
 
-  void showFormDialog({int? id, String? currentName}) {
+  void showFormDialog({int? id, String? currentName, String? currentKategori}) {
     final formKey = GlobalKey<FormState>();
     final controller = TextEditingController(text: currentName ?? "");
+    String selectedKategori = currentKategori ?? "Ikan Laut";
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Text(
-            id == null ? "Tambah Master Ikan" : "Edit Nama Ikan",
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
-          ),
-          content: Form(
-            key: formKey,
-            child: TextFormField(
-              controller: controller,
-              decoration: InputDecoration(
-                labelText: "Nama Ikan",
-                labelStyle: GoogleFonts.poppins(),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Text(
+                id == null ? "Tambah Master Ikan" : "Edit Nama Ikan",
+                style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+              ),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: controller,
+                      decoration: InputDecoration(
+                        labelText: "Nama Ikan",
+                        labelStyle: GoogleFonts.poppins(),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return "Nama ikan tidak boleh kosong";
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: selectedKategori,
+                      decoration: InputDecoration(
+                        labelText: "Kategori",
+                        labelStyle: GoogleFonts.poppins(),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: "Ikan Laut", child: Text("Ikan Laut")),
+                        DropdownMenuItem(value: "Ikan Tawar", child: Text("Ikan Tawar")),
+                        DropdownMenuItem(value: "Udang", child: Text("Udang")),
+                        DropdownMenuItem(value: "Kerang", child: Text("Kerang")),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) {
+                          setStateDialog(() {
+                            selectedKategori = val;
+                          });
+                        }
+                      },
+                    ),
+                  ],
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
-              validator: (v) {
-                if (v == null || v.trim().isEmpty) {
-                  return "Nama ikan tidak boleh kosong";
-                }
-                return null;
-              },
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                "Batal",
-                style: GoogleFonts.poppins(color: Colors.grey),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0060A9),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    "Batal",
+                    style: GoogleFonts.poppins(color: Colors.grey),
+                  ),
                 ),
-              ),
-              onPressed: () {
-                if (formKey.currentState!.validate()) {
-                  Navigator.pop(context);
-                  if (id == null) {
-                    tambahIkan(controller.text.trim());
-                  } else {
-                    editIkan(id, controller.text.trim());
-                  }
-                }
-              },
-              child: Text(
-                "Simpan",
-                style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0060A9),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      Navigator.pop(context);
+                      if (id == null) {
+                        tambahIkan(controller.text.trim(), selectedKategori);
+                      } else {
+                        editIkan(id, controller.text.trim(), selectedKategori);
+                      }
+                    }
+                  },
+                  child: Text(
+                    "Simpan",
+                    style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -349,17 +384,33 @@ class _MasterIkanPageState extends State<MasterIkanPage> {
                                   ),
                                   const SizedBox(width: 14),
                                   Expanded(
-                                    child: Text(
-                                      nama,
-                                      style: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                        color: const Color(0xFF2C3E50),
-                                      ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          nama,
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                            color: const Color(0xFF2C3E50),
+                                          ),
+                                        ),
+                                        Text(
+                                          item["kategori"]?.toString() ?? "Ikan Laut",
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 11,
+                                            color: Colors.grey.shade500,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   IconButton(
-                                    onPressed: () => showFormDialog(id: id, currentName: nama),
+                                    onPressed: () => showFormDialog(
+                                      id: id,
+                                      currentName: nama,
+                                      currentKategori: item["kategori"]?.toString(),
+                                    ),
                                     icon: const Icon(Icons.edit_outlined, color: Colors.blue, size: 20),
                                   ),
                                   IconButton(

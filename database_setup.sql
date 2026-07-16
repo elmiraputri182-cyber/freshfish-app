@@ -44,5 +44,6 @@ WHERE role = 'admin';
 CREATE TABLE IF NOT EXISTS master_ikan (
     id_master INT AUTO_INCREMENT PRIMARY KEY,
     nama_ikan VARCHAR(100) UNIQUE NOT NULL,
+    kategori VARCHAR(50) NOT NULL DEFAULT 'Ikan Laut',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

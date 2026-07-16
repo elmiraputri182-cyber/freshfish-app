@@ -292,65 +292,13 @@ class _TambahIkanPageState extends State<TambahIkanPage> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                "Nama Ikan",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.01),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xffEBF2FF), width: 1.5),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButtonFormField<String>(
-                  value: selectedNamaIkan,
-                  isExpanded: true,
-                  hint: Text(
-                    "Pilih Nama Ikan",
-                    style: GoogleFonts.poppins(color: Colors.grey),
-                  ),
-                  decoration: const InputDecoration(border: InputBorder.none),
-                  validator: (value) => value == null ? "Silakan pilih nama ikan" : null,
-                  style: GoogleFonts.poppins(color: Colors.black87, fontSize: 14),
-                  items: listMasterIkan.map<DropdownMenuItem<String>>((item) {
-                    final nama = item["nama_ikan"].toString();
-                    return DropdownMenuItem<String>(
-                      value: nama,
-                      child: Text(nama),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedNamaIkan = value;
-                      namaController.text = value ?? "";
-                    });
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            Align(
-
-              alignment: Alignment.centerLeft,
-
-              child: Text(
-
                 "Kategori",
-
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-
             const SizedBox(height: 10),
-
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
               decoration: BoxDecoration(
@@ -384,6 +332,63 @@ class _TambahIkanPageState extends State<TambahIkanPage> {
                   onChanged: (value) {
                     setState(() {
                       kategori = value!;
+                      // Reset selectedNamaIkan if not in the new category
+                      final filtered = listMasterIkan
+                          .where((item) => item["kategori"]?.toString() == kategori)
+                          .toList();
+                      final found = filtered.any((item) => item["nama_ikan"].toString() == selectedNamaIkan);
+                      if (!found) {
+                        selectedNamaIkan = null;
+                        namaController.clear();
+                      }
+                    });
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Nama Ikan",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.01),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xffEBF2FF), width: 1.5),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButtonFormField<String>(
+                  value: selectedNamaIkan,
+                  isExpanded: true,
+                  hint: Text(
+                    "Pilih Nama Ikan",
+                    style: GoogleFonts.poppins(color: Colors.grey),
+                  ),
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  validator: (value) => value == null ? "Silakan pilih nama ikan" : null,
+                  style: GoogleFonts.poppins(color: Colors.black87, fontSize: 14),
+                  items: listMasterIkan
+                      .where((item) => item["kategori"]?.toString() == kategori)
+                      .map<DropdownMenuItem<String>>((item) {
+                    final nama = item["nama_ikan"].toString();
+                    return DropdownMenuItem<String>(
+                      value: nama,
+                      child: Text(nama),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedNamaIkan = value;
+                      namaController.text = value ?? "";
                     });
                   },
                 ),

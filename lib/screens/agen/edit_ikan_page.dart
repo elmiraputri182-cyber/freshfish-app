@@ -53,7 +53,8 @@ class _EditIkanPageState extends State<EditIkanPage> {
             if (!exists && selectedNamaIkan != null) {
               listMasterIkan.add({
                 "id_master": 0,
-                "nama_ikan": selectedNamaIkan
+                "nama_ikan": selectedNamaIkan,
+                "kategori": kategori
               });
             }
           });
@@ -252,39 +253,6 @@ class _EditIkanPageState extends State<EditIkanPage> {
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
               child: DropdownButtonHideUnderline(
-                child: DropdownButtonFormField<String>(
-                  value: selectedNamaIkan,
-                  isExpanded: true,
-                  hint: Text(
-                    "Pilih Nama Ikan",
-                    style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey.shade500),
-                  ),
-                  decoration: const InputDecoration(border: InputBorder.none),
-                  style: GoogleFonts.poppins(fontSize: 14, color: const Color(0xFF2C3E50), fontWeight: FontWeight.bold),
-                  items: listMasterIkan.map<DropdownMenuItem<String>>((item) {
-                    final n = item["nama_ikan"].toString();
-                    return DropdownMenuItem<String>(
-                      value: n,
-                      child: Text(n),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedNamaIkan = value;
-                      nama.text = value ?? "";
-                    });
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-              child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   value: kategori,
                   isExpanded: true,
@@ -309,8 +277,52 @@ class _EditIkanPageState extends State<EditIkanPage> {
                     if (value != null) {
                       setState(() {
                         kategori = value;
+                        // Reset selectedNamaIkan if not in the new category
+                        final filtered = listMasterIkan
+                            .where((item) => item["kategori"]?.toString() == kategori)
+                            .toList();
+                        final found = filtered.any((item) => item["nama_ikan"].toString() == selectedNamaIkan);
+                        if (!found) {
+                          selectedNamaIkan = null;
+                          nama.clear();
+                        }
                       });
                     }
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButtonFormField<String>(
+                  value: selectedNamaIkan,
+                  isExpanded: true,
+                  hint: Text(
+                    "Pilih Nama Ikan",
+                    style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey.shade500),
+                  ),
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  style: GoogleFonts.poppins(fontSize: 14, color: const Color(0xFF2C3E50), fontWeight: FontWeight.bold),
+                  items: listMasterIkan
+                      .where((item) => item["kategori"]?.toString() == kategori)
+                      .map<DropdownMenuItem<String>>((item) {
+                    final n = item["nama_ikan"].toString();
+                    return DropdownMenuItem<String>(
+                      value: n,
+                      child: Text(n),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedNamaIkan = value;
+                      nama.text = value ?? "";
+                    });
                   },
                 ),
               ),
