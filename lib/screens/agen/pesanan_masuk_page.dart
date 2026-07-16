@@ -45,7 +45,7 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
     }
   }
 
-  void _showContactDialog(BuildContext context, String noHp, String nama, {String? idPesanan, String? namaIkan}) {
+  void _showContactDialog(BuildContext context, String noHp, String nama, {String? idPesanan, String? namaIkan, String? jenisPesanan}) {
     String formattedPhone = noHp.replaceAll(RegExp(r'[^0-9]'), '');
     if (formattedPhone.startsWith('0')) {
       formattedPhone = '62' + formattedPhone.substring(1);
@@ -104,14 +104,27 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                   final pref = await SharedPreferences.getInstance();
                   final namaAgen = pref.getString("nama") ?? pref.getString("nama_lengkap") ?? "Agen";
                   
-                  String message = "Halo $nama, kami dari Agen $namaAgen ingin mengonfirmasi pesanan Anda";
-                  if (namaIkan != null && namaIkan.isNotEmpty) {
-                    message += " ($namaIkan)";
+                  final isPreOrder = jenisPesanan?.toLowerCase().replaceAll(' ', '') == "preorder";
+                  String message = "";
+                  if (isPreOrder) {
+                    message = "Halo $nama, kami dari Agen $namaAgen ingin mengonfirmasi pesanan Pre-Order Anda";
+                    if (namaIkan != null && namaIkan.isNotEmpty) {
+                      message += " ($namaIkan)";
+                    }
+                    if (idPesanan != null && idPesanan.isNotEmpty) {
+                      message += " dengan Kode Pesanan #$idPesanan";
+                    }
+                    message += ". Kami ingin mengonfirmasi terkait ketersediaan tangkapan ikannya terlebih dahulu.";
+                  } else {
+                    message = "Halo $nama, kami dari Agen $namaAgen ingin mengonfirmasi pesanan Anda";
+                    if (namaIkan != null && namaIkan.isNotEmpty) {
+                      message += " ($namaIkan)";
+                    }
+                    if (idPesanan != null && idPesanan.isNotEmpty) {
+                      message += " dengan Kode Pesanan #$idPesanan";
+                    }
+                    message += ". Mohon ditunggu ya.";
                   }
-                  if (idPesanan != null && idPesanan.isNotEmpty) {
-                    message += " dengan Kode Pesanan #$idPesanan";
-                  }
-                  message += ". Mohon ditunggu ya.";
                   
                   final textEncoded = Uri.encodeComponent(message);
                   final url = Uri.parse("https://wa.me/$formattedPhone?text=$textEncoded");
@@ -531,6 +544,7 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                                                   item["nama_lengkap"] ?? "-",
                                                   idPesanan: item["id_pesanan"]?.toString(),
                                                   namaIkan: displayNamaIkan,
+                                                  jenisPesanan: item["jenis_pesanan"]?.toString(),
                                                 );
                                               },
                                               child: Row(
