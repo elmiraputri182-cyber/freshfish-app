@@ -80,8 +80,10 @@ class _DetailPesananPageState extends State<DetailPesananPage> {
                 onTap: () async {
                   Navigator.pop(context);
                   final url = Uri.parse("https://wa.me/$formattedPhone");
-                  if (await canLaunchUrl(url)) {
+                  try {
                     await launchUrl(url, mode: LaunchMode.externalApplication);
+                  } catch (e) {
+                    debugPrint(e.toString());
                   }
                 },
               ),
@@ -108,8 +110,10 @@ class _DetailPesananPageState extends State<DetailPesananPage> {
                 onTap: () async {
                   Navigator.pop(context);
                   final phoneUrl = Uri.parse("tel:${noHp.replaceAll(RegExp(r'[^0-9+]'), '')}");
-                  if (await canLaunchUrl(phoneUrl)) {
+                  try {
                     await launchUrl(phoneUrl);
+                  } catch (e) {
+                    debugPrint(e.toString());
                   }
                 },
               ),
