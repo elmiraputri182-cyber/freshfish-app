@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:appfreshfish/services/pdf_service.dart';
 
 class InvoicePesananPage extends StatelessWidget {
   final Map data;
@@ -273,6 +274,48 @@ class InvoicePesananPage extends StatelessWidget {
                     ],
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // Download PDF Button
+            SizedBox(
+              width: double.infinity,
+              height: 54,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0060A9),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                ),
+                onPressed: () {
+                  final List itemsList = [];
+                  if (listItems.isNotEmpty) {
+                    itemsList.addAll(listItems);
+                  } else {
+                    itemsList.add({
+                      "nama_ikan": data["nama_ikan"] ?? "-",
+                      "harga": data["harga"] ?? 0,
+                      "jumlah": data["jumlah_kg"] ?? 1,
+                      "subtotal": data["total_harga"] ?? 0,
+                    });
+                  }
+                  PdfService.cetakInvoice(
+                    data: data,
+                    items: itemsList,
+                  );
+                },
+                icon: const Icon(Icons.picture_as_pdf_outlined),
+                label: Text(
+                  "Unduh / Bagikan Invoice PDF",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
               ),
             ),
           ],
