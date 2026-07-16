@@ -24,6 +24,8 @@ class InvoicePesananPage extends StatelessWidget {
     final metodePembayaran = data["metode_pembayaran"]?.toString().toUpperCase() ?? "CASH";
     final metodePengambilan = data["metode_pengambilan"]?.toString().toUpperCase() ?? "COD";
     final status = data["status"] ?? "-";
+    final String jenisPesanan = data["jenis_pesanan"]?.toString().toLowerCase().trim() ?? "order";
+    final bool isPreOrder = jenisPesanan == "preorder" || jenisPesanan == "pre order";
 
     final listItems = data["items"] as List? ?? [];
     double totalHarga = double.tryParse(data["total_pembayaran"]?.toString() ?? "") ?? 
@@ -71,7 +73,7 @@ class InvoicePesananPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "FRESH FISH",
+                    isPreOrder ? "FRESH FISH - PRE-ORDER" : "FRESH FISH",
                     style: GoogleFonts.poppins(
                       color: Colors.white.withOpacity(0.9),
                       fontSize: 14,
@@ -122,6 +124,12 @@ class InvoicePesananPage extends StatelessWidget {
                   const Divider(height: 24),
                   _buildDetailRow(Icons.storefront_outlined, "Agen Penjual", namaAgen),
                   const Divider(height: 24),
+                  _buildDetailRow(Icons.shopping_bag_outlined, "Metode Pemesanan", isPreOrder ? "Pre-Order" : "Beli Langsung"),
+                  const Divider(height: 24),
+                  if (isPreOrder) ...[
+                    _buildDetailRow(Icons.calendar_today_outlined, "Estimasi Diperlukan", data["tanggal_dibutuhkan"] ?? "-"),
+                    const Divider(height: 24),
+                  ],
                   _buildDetailRow(Icons.payment_outlined, "Metode Pembayaran", metodePembayaran),
                   const Divider(height: 24),
                   _buildDetailRow(Icons.local_shipping_outlined, "Metode Pengambilan", metodePengambilan),
@@ -276,6 +284,34 @@ class InvoicePesananPage extends StatelessWidget {
                 ],
               ),
             ),
+            if (isPreOrder) ...[
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.orange.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline_rounded, color: Colors.orange.shade800),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        "Catatan: Ini adalah pesanan Pre-Order. Agen akan menghubungi Anda untuk konfirmasi ketersediaan tangkapan sebelum diproses.",
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: Colors.orange.shade900,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 32),
 
             // Download PDF Button

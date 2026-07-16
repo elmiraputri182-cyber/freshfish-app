@@ -83,6 +83,9 @@ class PdfService {
     final namaAgen = data["nama_agen"] ?? "-";
     final metodePembayaran = data["metode_pembayaran"]?.toString().toUpperCase() ?? "CASH";
     final metodePengambilan = data["metode_pengambilan"]?.toString().toUpperCase() ?? "COD";
+    final String jenisPesanan = data["jenis_pesanan"]?.toString().toLowerCase().trim() ?? "order";
+    final bool isPreOrder = jenisPesanan == "preorder" || jenisPesanan == "pre order";
+    final tglDibutuhkan = data["tanggal_dibutuhkan"]?.toString() ?? "-";
 
     pdf.addPage(
       pw.Page(
@@ -106,8 +109,8 @@ class PdfService {
                     ),
                     pw.SizedBox(height: 2),
                     pw.Text(
-                      "Segar & Langsung Dari Nelayan",
-                      style: const pw.TextStyle(fontSize: 8),
+                      isPreOrder ? "*** STRUK PRE-ORDER ***" : "Segar & Langsung Dari Nelayan",
+                      style: pw.TextStyle(fontSize: 8, fontWeight: isPreOrder ? pw.FontWeight.bold : pw.FontWeight.normal),
                       textAlign: pw.TextAlign.center,
                     ),
                     pw.Text(
@@ -126,6 +129,9 @@ class PdfService {
               // Metadata Transaksi
               pw.Text("No. Invoice : #$idPesanan", style: const pw.TextStyle(fontSize: 8)),
               pw.Text("Tanggal     : $tanggal", style: const pw.TextStyle(fontSize: 8)),
+              pw.Text("Metode      : ${isPreOrder ? "Pre-Order" : "Beli Langsung"}", style: const pw.TextStyle(fontSize: 8)),
+              if (isPreOrder)
+                pw.Text("Est. Butuh  : $tglDibutuhkan", style: const pw.TextStyle(fontSize: 8)),
               pw.Text("Pembeli     : $namaPembeli", style: const pw.TextStyle(fontSize: 8)),
               pw.Text("Agen        : $namaAgen", style: const pw.TextStyle(fontSize: 8)),
               pw.Text("Bayar/Ambil : $metodePembayaran / $metodePengambilan", style: const pw.TextStyle(fontSize: 8)),
@@ -135,7 +141,7 @@ class PdfService {
               pw.SizedBox(height: 6),
 
               // Daftar Item Belanja
-              pw.Text("DAFTAR BELANJA:", style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+              pw.Text(isPreOrder ? "DAFTAR PRE-ORDER:" : "DAFTAR BELANJA:", style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 4),
 
               ...List.generate(items.length, (index) {
@@ -193,7 +199,23 @@ class PdfService {
 
               pw.SizedBox(height: 6),
               pw.Text("------------------------------------------", style: const pw.TextStyle(fontSize: 8)),
-              pw.SizedBox(height: 10),
+              pw.SizedBox(height: 8),
+
+              if (isPreOrder) ...[
+                pw.Center(
+                  child: pw.Container(
+                    width: 150,
+                    child: pw.Text(
+                      "Catatan: Ini adalah pesanan Pre-Order. Agen akan menghubungi Anda untuk konfirmasi ketersediaan tangkapan sebelum diproses.",
+                      style: pw.TextStyle(fontSize: 6, fontStyle: pw.FontStyle.italic),
+                      textAlign: pw.TextAlign.center,
+                    ),
+                  ),
+                ),
+                pw.SizedBox(height: 6),
+                pw.Text("------------------------------------------", style: const pw.TextStyle(fontSize: 8)),
+                pw.SizedBox(height: 8),
+              ],
 
               // Footer
               pw.Center(
@@ -204,7 +226,7 @@ class PdfService {
                       style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
                     ),
                     pw.Text(
-                      "Sudah Berbelanja di Toko Kami!",
+                      isPreOrder ? "Sudah Melakukan Pre-Order!" : "Sudah Berbelanja di Toko Kami!",
                       style: const pw.TextStyle(fontSize: 8),
                     ),
                     pw.SizedBox(height: 4),
